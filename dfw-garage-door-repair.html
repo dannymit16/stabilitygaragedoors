@@ -127,6 +127,8 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:18px}
 .sticky a{flex:1;text-align:center;font-weight:800;font-size:18px;padding:14px 8px;border-radius:10px}
 .sticky .c{background:var(--orange);color:#fff;flex:2}
 .sticky .t{background:var(--navy);color:#fff}
+.lead-form{display:grid;gap:10px}
+.lead-form input,.lead-form select{font:inherit;font-size:17px;padding:14px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;width:100%}
 @media(min-width:900px){.sticky{display:none}body{padding-bottom:0}}
 </style>
 </head>
@@ -146,7 +148,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:18px}
     <p class="lead" id="lead">Broken spring, opener not working, door stuck or off track? A local technician comes out the same day, gives you a free estimate, and fixes it on the spot.</p>
     <div class="cta-row">
       <a class="btn btn-call" href="tel:+19453601274" onclick="trackCall()">📞 Call <span class="ph">(945) 360-1274</span></a>
-      <a class="btn btn-text" href="sms:+19453601274" onclick="trackText()">💬 Text Us a Photo</a>
+      <a class="btn btn-text" href="#quote">📝 Free Estimate Form</a>
     </div>
     <div class="checks">
       <span>Free Estimate</span><span>Licensed &amp; Insured</span><span>Upfront Pricing</span><span>Local DFW Technicians</span>
@@ -164,6 +166,32 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:18px}
       <div class="card" id="c-track"><img src="images/Garage-Door-Track-Repair.jpg" alt="Garage door off track repair" loading="lazy"><div class="b"><h3>Off Track &amp; Stuck</h3><p>Door crooked, stuck or off its track? We realign it safely and get it moving.</p></div></div>
       <div class="card" id="c-cable"><img src="images/Cable-Repair.jpg" alt="Garage door cable repair" loading="lazy"><div class="b"><h3>Cables &amp; Rollers</h3><p>Snapped cables, worn rollers and noisy doors — fixed and tuned up.</p></div></div>
     </div>
+  </div>
+</section>
+
+<section class="sec" id="quote" style="background:#fff7f2">
+  <div class="wrap" style="max-width:640px">
+    <h2>Get a Free Estimate</h2>
+    <p class="sub">Leave your number — we'll call you back within minutes during business hours.</p>
+    <form id="lead" class="lead-form">
+      <input type="hidden" name="access_key" value="b3087efe-8019-4983-a5aa-4fb7aaff596d">
+      <input type="hidden" name="subject" value="New lead - DFW Garage Door Repair (Google Ads LP)">
+      <input type="hidden" name="from_name" value="Stability LP">
+      <input type="checkbox" name="botcheck" style="display:none">
+      <input type="hidden" name="gclid" id="f_gclid">
+      <input type="hidden" name="service" id="f_svc">
+      <input type="hidden" name="landing_city" id="f_city">
+      <input type="text" name="name" placeholder="Your name" required autocomplete="name">
+      <input type="tel" name="phone" placeholder="Phone number" required autocomplete="tel">
+      <input type="text" name="zip" placeholder="ZIP code" inputmode="numeric" maxlength="5" required>
+      <select name="problem" required>
+        <option value="">What's wrong?</option>
+        <option>Broken spring</option><option>Opener not working</option><option>Door off track / stuck</option>
+        <option>Cable or rollers</option><option>Noisy door / tune-up</option><option>New garage door</option><option>Other</option>
+      </select>
+      <button type="submit" class="btn btn-call" style="width:100%">Get My Free Estimate</button>
+      <p id="lead_msg" style="margin-top:10px;font-weight:600"></p>
+    </form>
   </div>
 </section>
 
@@ -229,6 +257,27 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:18px}
     opener:  ['Garage Door Opener <span>Repair Today</span>', 'Opener not working, humming or the remote quit? We repair or replace LiftMaster, Chamberlain, Genie and more — same day, free estimate.', 'c-opener'],
     offtrack:['Garage Door Stuck or <span>Off Track?</span>', 'Door crooked, jammed or off its track? Don\'t force it — a technician comes out the same day, realigns it safely and gets it working.', 'c-track']
   };
+  // Lead form: attach click IDs + context, send to Web3Forms, record conversion
+  try{
+    var g = JSON.parse(localStorage.getItem('sgd_gclid')||'null') || JSON.parse(localStorage.getItem('sgd_gbraid')||'null') || JSON.parse(localStorage.getItem('sgd_wbraid')||'null');
+    document.getElementById('f_gclid').value = g ? g.v : '';
+  }catch(e){}
+  document.getElementById('f_svc').value = s;
+  document.getElementById('f_city').value = city;
+  var form = document.getElementById('lead');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var msg = document.getElementById('lead_msg'); msg.textContent = 'Sending...';
+    fetch('https://api.web3forms.com/submit', {method:'POST', headers:{'Accept':'application/json'}, body:new FormData(form)})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d.success){
+          msg.textContent = 'Thanks! We\'ll call you shortly.'; form.reset();
+          gtag('event','generate_lead',{'event_category':'lead','service':s});
+          if(window.fbq) fbq('track','Lead');
+        } else { msg.textContent = 'Something went wrong — please call (945) 360-1274.'; }
+      }).catch(function(){ msg.textContent = 'Something went wrong — please call (945) 360-1274.'; });
+  });
   if(copy[s]){
     document.getElementById('h1').innerHTML = copy[s][0];
     document.getElementById('lead').textContent = copy[s][1];
