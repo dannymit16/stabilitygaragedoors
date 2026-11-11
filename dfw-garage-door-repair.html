@@ -173,7 +173,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:18px}
   <div class="wrap" style="max-width:640px">
     <h2>Get a Free Estimate</h2>
     <p class="sub">Leave your number — we'll call you back within minutes during business hours.</p>
-    <form id="lead" class="lead-form">
+    <form id="leadform" class="lead-form" action="https://api.web3forms.com/submit" method="POST">
       <input type="hidden" name="access_key" value="b3087efe-8019-4983-a5aa-4fb7aaff596d">
       <input type="hidden" name="subject" value="New lead - DFW Garage Door Repair (Google Ads LP)">
       <input type="hidden" name="from_name" value="Stability LP">
@@ -264,7 +264,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:18px}
   }catch(e){}
   document.getElementById('f_svc').value = s;
   document.getElementById('f_city').value = city;
-  var form = document.getElementById('lead');
+  var form = document.getElementById('leadform');
   form.addEventListener('submit', function(e){
     e.preventDefault();
     var msg = document.getElementById('lead_msg'); msg.textContent = 'Sending...';
